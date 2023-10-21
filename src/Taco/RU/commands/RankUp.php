@@ -1,17 +1,23 @@
-<?php namespace Taco\RU\commands;
+<?php
+
+namespace Taco\RU\commands;
 
 use Taco\RU\Main;
-use pocketmine\{command\PluginCommand, command\CommandSender, plugin\Plugin};
+use pocketmine\command\Command;
+use pocketmine\command\PluginCommand;
+use pocketmine\command\CommandSender;
+use pocketmine\command\plugin\Plugin;
 
-class RankUp extends PluginCommand {
+class RankUp extends Command {
 
 	/**
 	 * RankUp constructor.
 	 * @param Main $plugin
 	 */
 	public function __construct(Main $plugin) {
-		parent::__construct("rankup", $plugin);
-		$this->setDescription("Ascend through the ranks!");
+		parent::__construct("rankup", "upar seu rank");
+		$this->setPermission("rankup.command");
+		$this->setDescription("Upar seu rank!");
 		$this->setAliases(["ru"]);
 	}
 

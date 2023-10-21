@@ -2,11 +2,14 @@
 
 use pocketmine\{event\Listener,
 	event\player\PlayerJoinEvent,
-	event\player\PlayerPreLoginEvent,
+	event\player\PlayerLoginEvent,
 	plugin\Plugin,
 	plugin\PluginBase,
 	utils\Config};
 use Taco\RU\commands\RankUp;
+
+use IvanCraft623\RankSystem\tag\Tag;
+use IvanCraft623\RankSystem\RankSystem;
 
 class Main extends PluginBase implements Listener  {
 
@@ -58,15 +61,23 @@ class Main extends PluginBase implements Listener  {
 	}
 
 	/**
-	 * @param PlayerPreLoginEvent $event
+	 * @param PlayerLoginEvent $event
 	 */
-	public function preJoin(PlayerPreLoginEvent $event) : void {
+	public function preJoin(PlayerLoginEvent $event) : void {
 		$player = $event->getPlayer();
+		//$playerName = $player->getName();
 		if (!$this->ranks->exists($player->getName())) {
 			$this->ranks->set($player->getName(), $this->config["default-rank"]);
 			$this->ranks->save();
 		}
+		if ($this->ranks->exists($player->getName())) {
+            $rank = $this->ranks->get($player->getName());
+            if (isset($this->config["ranks"][$rank])) {
+                $permissions = $this->config["ranks"][$rank]["permissions"];
+                foreach ($permissions as $permission) {
+                    $player->addAttachment($this, $permission, true);
+                }
+            }
+        }
 	}
-
-
 }

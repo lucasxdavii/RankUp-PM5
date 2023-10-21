@@ -1,6 +1,7 @@
 <?php namespace Taco\RU;
 
-use pocketmine\{command\ConsoleCommandSender, Player};
+use pocketmine\command\ConsoleCommandSender;
+use pocketmine\player\Player;
 
 class API {
 
@@ -65,12 +66,24 @@ class API {
 	public function rankUp(Player $player) : void {
 		$next = $this->getNextRank($player);
 		$current = $this->getRank($player);
+		$previousRank = $this->getRank($player);
+		$previousRankPermissions = Main::getInstance()->config["ranks"][$previousRank]["permissions"];
 		if ($this->getNextRank($player) !== "") {
 			$money = Main::getInstance()->economy->myMoney($player);
 			if ($money >= $this->getNextRankPrice($player)) {
-				foreach(Main::getInstance()->config["ranks"][$next]["commands"] as $command) {
-					$command = str_replace("{player}", $player->getName(), $command);
-					Main::getInstance()->getServer()->dispatchCommand(new ConsoleCommandSender(), $command);
+
+				foreach ($previousRankPermissions as $permission) {
+					$plugin = Main::getInstance();
+					$player->removeAttachment($plugin, $permission);
+				}
+
+				if (isset(Main::getInstance()->config["ranks"][$nextRank]["permissions"]) && is_array(Main::getInstance()->config["ranks"][$nextRank]["permissions"])) {
+					$plugin = Main::getInstance();
+					$permissions = Main::getInstance()->config["ranks"][$nextRank]["permissions"];
+				
+					foreach ($permissions as $permission) {
+						$player->addAttachment($plugin, $permission, true);
+					}
 				}
 				$message = Main::getInstance()->config["rankup-success"];
 				$message = str_replace("{new-rank}", $this->getNextRank($player), $message);
